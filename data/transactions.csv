@@ -1,0 +1,6 @@
+transaction_id,user_id,amount,currency,location,merchant,timestamp
+txn_000001,u_002,2419.98,USD,IN,fintech,2026-02-20T21:03:21
+txn_000002,u_003,3147.09,USD,RU,gaming,2026-02-20T21:03:21
+txn_000003,u_001,332.77,USD,US,gaming,2026-02-20T21:03:21
+txn_000004,u_003,438.34,USD,US,electronics,2026-02-20T21:03:21
+txn_000005,u_002,229.5,USD,US,fintech,2026-02-20T21:03:21
