@@ -4,8 +4,13 @@ from __future__ import annotations
 
 import csv
 import random
+import sys
 import time
 from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from utils.helpers import iso_now
 
@@ -61,10 +66,12 @@ if __name__ == "__main__":
             )
             writer.writeheader()
 
-    i = 1
+    i = 10
     while True:
         transaction = generate_transaction(i)
         append_transaction(transaction)
         print(f"Generated: {transaction}")
-        i += 1
+        i -= 1
+        if i < 0:
+            break
         time.sleep(2)
