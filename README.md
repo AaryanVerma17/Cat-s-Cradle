@@ -103,12 +103,4 @@ Dashboard includes:
 
 ## Sample Screenshot
 
-Add your latest dashboard screenshot here after running the app:
-
 `![dashboard screenshot](path/to/screenshot.png)`
-
-## Stretch Extensions
-
-- Replace rule engine with trained model in `scoring/ml_model.py`
-- Add full policy-grounded RAG reasoning in `assistant/rag_pipeline.py`
-- Add Kafka or webhook ingestion for true real-time streaming
