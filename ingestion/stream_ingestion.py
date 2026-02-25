@@ -1,30 +1,32 @@
-"""Pathway ingestion abstraction.
+"""Pathway-based streaming ingestion with practical implementation.
 
-Uses pandas polling as a hackathon-friendly default while preserving a clean interface
-that can be swapped with `pathway.io.csv.read` in production.
+Uses Pathway's CSV connector in streaming mode for automatic data updates.
 """
 
 from __future__ import annotations
 
-from pathlib import Path
-
-import pandas as pd
-
-from config.settings import STREAM_FILE_PATH
+import pathway as pw
 
 
-def load_stream_snapshot(path: str = STREAM_FILE_PATH) -> pd.DataFrame:
-    file_path = Path(path)
-    if not file_path.exists():
-        return pd.DataFrame(
-            columns=[
-                "transaction_id",
-                "user_id",
-                "amount",
-                "currency",
-                "location",
-                "merchant",
-                "timestamp",
-            ]
-        )
-    return pd.read_csv(file_path)
+class TransactionSchema(pw.Schema):
+    transaction_id: str
+    user_id: str
+    amount: str  # Will be converted to float in processing
+    currency: str
+    location: str
+    merchant: str
+    timestamp: str
+
+
+def create_streaming_source(path: str) -> pw.Table:
+    """Create a Pathway streaming data source.
+    
+    This uses Pathway's CSV reader in streaming mode with autocommit.
+    New rows in the CSV are automatically detected and processed.
+    """
+    return pw.io.csv.read(
+        path,
+        schema=TransactionSchema,
+        mode="streaming",
+        autocommit_duration_ms=500,
+    )

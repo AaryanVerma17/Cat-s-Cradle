@@ -1,31 +1,53 @@
-"""Rule-based fraud scoring engine."""
+"""Rule-based scoring with Pathway transformations."""
 
 from __future__ import annotations
 
-import pandas as pd
-
+import pathway as pw
 from config.settings import LARGE_TXN_MULTIPLIER, RAPID_FIRE_TXN_COUNT
 
 
-def calculate_risk_score(row: pd.Series) -> float:
-    score = 0.0
-
-    if row["amount"] > row["rolling_avg_amount"] * LARGE_TXN_MULTIPLIER:
-        score += 0.45
-
-    if row["txn_count_in_window"] >= RAPID_FIRE_TXN_COUNT:
-        score += 0.3
-
-    if bool(row["location_changed"]):
-        score += 0.25
-
-    return min(score, 1.0)
-
-
-def apply_rule_scoring(df: pd.DataFrame) -> pd.DataFrame:
-    if df.empty:
-        return df
-
-    scored = df.copy()
-    scored["risk_score"] = scored.apply(calculate_risk_score, axis=1)
-    return scored
+def apply_rule_scoring(table: pw.Table) -> pw.Table:
+    """Apply rule-based fraud scoring with breakdown tracking."""
+    
+    # Detect triggers
+    table = table.with_columns(
+        triggered_large_amount=(
+            pw.this.amount > (pw.this.rolling_avg_amount * LARGE_TXN_MULTIPLIER)
+        ),
+        triggered_rapid_fire=(
+            pw.this.txn_count_in_window >= RAPID_FIRE_TXN_COUNT
+        ),
+        triggered_location_change=pw.this.location_changed,
+    )
+    
+    # Calculate risk score
+    table = table.with_columns(
+        large_score=pw.if_else(pw.this.triggered_large_amount, 0.5, 0.0),
+        rapid_score=pw.if_else(pw.this.triggered_rapid_fire, 0.3, 0.0),
+        location_score=pw.if_else(pw.this.triggered_location_change, 0.25, 0.0),
+    )
+    
+    table = table.with_columns(
+        risk_score=pw.this.large_score + pw.this.rapid_score + pw.this.location_score
+    )
+    
+    # Add explanation
+    table = table.with_columns(
+        explanation=pw.apply(
+            lambda large, rapid, location: (
+                "Potential fraud flagged because " + 
+                ", ".join([
+                    reason for reason, triggered in [
+                        ("transaction amount is much higher than normal", large),
+                        ("multiple rapid transactions detected", rapid),
+                        ("location changed from previous transaction", location),
+                    ] if triggered
+                ]) + "." if any([large, rapid, location]) else "Low risk - no strong signals"
+            ),
+            pw.this.triggered_large_amount,
+            pw.this.triggered_rapid_fire,
+            pw.this.triggered_location_change,
+        )
+    )
+    
+    return table
