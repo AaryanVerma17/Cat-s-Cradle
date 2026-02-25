@@ -1,43 +1,272 @@
-### ✅ MERN Stack To-Do List Web App
+# 🚀 Real-Time Financial Fraud Detection + AI Risk Assistant
 
-This project is a fully functional **To-Do List application** developed using the **MERN stack** – **MongoDB**, **Express.js**, **React.js**, and **Node.js**. It allows users to seamlessly create, read, update, and delete tasks with real-time UI updates and a mobile-responsive interface. The frontend and backend are deployed separately, ensuring production readiness and scalable architecture.
-
-The application supports all standard CRUD operations. Users can add new tasks, mark them as completed, edit them on the fly, or delete them. The backend is built with Node.js and Express.js and connects to a MongoDB database using Mongoose. The frontend is built with React.js, styled with CSS, and communicates with the backend via RESTful APIs. The UI updates in real-time to ensure a smooth user experience.
-
-For deployment, the **frontend** is hosted on **Netlify**, and the **backend** is deployed on **Render**. Environment variables are used securely to configure API endpoints and database connections. Postman was used for testing APIs during development, and version control was managed using Git and GitHub.
-
-#### 🔧 Tech Stack:
-
-* **Frontend**: React.js, CSS
-* **Backend**: Node.js, Express.js
-* **Database**: MongoDB (via Mongoose)
-* **API Testing**: Postman
-* **Version Control**: Git & GitHub
-* **Deployment**: Netlify (Frontend), Render (Backend)
-
-#### 📁 Project Structure:
-
-The project is divided into two main directories:
-
-* `/client` – Contains the React frontend with components like `TodoForm`, `TodoList`, and `TodoItem`.
-* `/server` – Contains backend logic including database models (`Todo.js`), API routes (`todos.js`), and MongoDB connection configuration.
-
-#### 🌐 Live Demo & Links:
-
-* **Frontend**: [Netlify Link](https://mern-stack-projectaaryan-verma.netlify.app/)
-* **Backend API**: [Render Link](https://todo-backend-upxe.onrender.com)
-* **Demo Video**: [Watch on Drive](https://link-to-demo)
-
-#### 📌 Key Features:
-
-* Add, edit, complete, and delete tasks
-* Real-time UI updates
-* Responsive design for all devices
-* Environment-variable-based configuration
-* Clean folder structure for easy maintenance
-
-#### 🙌 Purpose & Learning:
-
-This project was built as part of the **Devtown Full Stack Bootcamp**. It helped solidify my understanding of full-stack development, API integration, environment configuration, and real-world deployment. The hands-on experience improved my ability to build scalable apps and enhanced my problem-solving skills as a MERN developer.
+A production-style real-time fraud detection system built using **Pathway** that ingests streaming transaction data, performs incremental feature engineering, computes fraud risk scores, and generates AI-powered explanations in real time.
 
 ---
+
+## 📌 Problem Statement
+
+Traditional fraud detection systems rely on batch processing, leading to delayed detection and stale insights.
+
+This project demonstrates:
+
+* Real-time streaming ingestion
+* Incremental fraud feature computation
+* Stateful anomaly detection
+* Event-driven alerting
+* AI-generated risk explanations
+
+All powered by a streaming-first architecture using Pathway.
+
+---
+
+## 🧠 Key Features
+
+### 🔹 1. Real-Time Streaming Ingestion
+
+* Live transaction stream via Pathway file connector
+* Auto-detection of new transactions
+* No pipeline restart required
+* Fully event-driven
+
+---
+
+### 🔹 2. Incremental Feature Engineering
+
+Computed in streaming mode using Pathway tables:
+
+* Rolling average spend per user
+* Transaction frequency in sliding time windows
+* Location change detection
+* User behavioral profiling
+
+All computations are stateful and incremental.
+
+---
+
+### 🔹 3. Fraud Risk Scoring Engine
+
+Hybrid scoring model:
+
+* Large transaction deviation
+* Rapid-fire transaction detection
+* Geographic anomaly detection
+
+Outputs a real-time fraud risk score (0–1).
+
+---
+
+### 🔹 4. Event-Driven Fraud Alerts
+
+When risk_score > threshold:
+
+* System triggers alert instantly
+* Alert severity classification (Low → Critical)
+* Dashboard updates automatically
+
+---
+
+### 🔹 5. AI Risk Assistant
+
+Integrated AI layer generates:
+
+* Human-readable fraud explanations
+* Context-aware reasoning
+* Transparent decision justification
+
+Example:
+
+> "This transaction was flagged because it is 4.3x higher than the user's average spend and occurred within 90 seconds of a previous cross-border transaction."
+
+---
+
+## 🏗 Architecture Overview
+
+```
+Live Transaction Stream
+        ↓
+Pathway Streaming Ingestion
+        ↓
+Incremental Feature Engineering
+        ↓
+Fraud Scoring Engine
+        ↓
+Event-Driven Alert Layer
+        ↓
+AI Explanation Generator
+        ↓
+Live Dashboard
+```
+
+---
+
+## ⚡ Why Pathway?
+
+This project strictly follows streaming-first principles:
+
+✔ No batch processing
+✔ No manual refresh
+✔ No static ML-only pipeline
+✔ All transformations executed inside Pathway streaming tables
+✔ Incremental computation with stateful windows
+
+The system automatically updates whenever new data arrives.
+
+---
+
+## 📊 Dashboard Features
+
+* Live transaction feed
+* Real-time fraud alert panel
+* Risk score visualization
+* Fraud trend graphs
+* User behavioral profile view
+* AI-generated fraud explanation panel
+
+---
+
+## 🛠 Tech Stack
+
+* **Pathway** – Real-time streaming engine
+* Python
+* Streamlit – Interactive dashboard
+* Scikit-learn (optional extension)
+* OpenAI API – AI explanation layer
+
+---
+
+## 📂 Project Structure
+
+```
+fraud-ai-assistant/
+│
+├── data/
+├── ingestion/
+├── features/
+├── scoring/
+├── alerts/
+├── assistant/
+├── pipeline/
+├── dashboard/
+└── utils/
+```
+
+Modular design ensures separation of concerns and production-style maintainability.
+
+---
+
+## ▶️ How To Run
+
+### 1️⃣ Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+### 2️⃣ Start Streaming Transaction Generator
+
+```bash
+python data/sample_transactions_generator.py
+```
+
+---
+
+### 3️⃣ Start Pathway Pipeline
+
+```bash
+python pipeline/main_pipeline.py
+```
+
+---
+
+### 4️⃣ Launch Dashboard
+
+```bash
+streamlit run dashboard/app.py
+```
+
+The system will now update automatically as new transactions stream in.
+
+---
+
+## 🔍 Real-Time Behavior Demonstration
+
+During demo:
+
+1. New transaction is appended
+2. Pipeline detects it instantly
+3. Features recomputed incrementally
+4. Risk score updated
+5. Alert triggered if threshold exceeded
+6. AI explanation generated
+7. Dashboard updates automatically
+
+No restart. No refresh.
+
+---
+
+## 🧪 Fraud Detection Logic
+
+Risk Score = Weighted combination of:
+
+* Transaction amount deviation
+* Rapid transaction bursts
+* Geographic anomaly
+* User behavior mismatch
+
+Severity Levels:
+
+* 🟢 Low
+* 🟡 Medium
+* 🔴 High
+* 🔥 Critical
+
+---
+
+## 📈 Stretch Capabilities
+
+* Live document store integration (AML compliance RAG)
+* Multi-source ingestion
+* User risk trend visualization
+* Graph-based anomaly detection
+* Dockerized deployment
+
+---
+
+## 🎯 Hackathon Alignment
+
+This project fully satisfies:
+
+* Real-time streaming ingestion
+* Stateful window computations
+* Incremental transformations
+* Event-driven architecture
+* AI reasoning integration
+* Production-ready modular design
+
+---
+
+## 🏆 Impact
+
+This system demonstrates how financial institutions can:
+
+* Detect fraud instantly
+* Reduce financial losses
+* Improve regulatory compliance
+* Increase explainability in AI-driven decisions
+
+---
+
+## 📜 License
+
+Built for Hack For Green Bharat – Pathway Track.
+
+---
+
+# 🔥 Final Impression
+
+This project is not just a fraud detector.
+
+It is a real-time, event-driven, explainable AI fraud intelligence system built with streaming-first principles.
