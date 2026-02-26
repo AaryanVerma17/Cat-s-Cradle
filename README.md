@@ -1,272 +1,173 @@
-# 🚀 Real-Time Financial Fraud Detection + AI Risk Assistant
+# 📌 Project Description
 
-A production-style real-time fraud detection system built using **Pathway** that ingests streaming transaction data, performs incremental feature engineering, computes fraud risk scores, and generates AI-powered explanations in real time.
+## Real-Time Financial Fraud Detection
 
----
+This project is a system that detects suspicious financial transactions in real time and explains why they might be fraud.
 
-## 📌 Problem Statement
+When a new transaction happens, the system:
 
-Traditional fraud detection systems rely on batch processing, leading to delayed detection and stale insights.
+1. Reads the transaction immediately
+2. Analyzes the user’s past behavior
+3. Calculates a fraud risk score
+4. Raises an alert if needed
+5. Explains the reason in simple language
 
-This project demonstrates:
-
-* Real-time streaming ingestion
-* Incremental fraud feature computation
-* Stateful anomaly detection
-* Event-driven alerting
-* AI-generated risk explanations
-
-All powered by a streaming-first architecture using Pathway.
+Everything happens automatically and updates live on the dashboard.
 
 ---
 
-## 🧠 Key Features
+# 🎯 What Problem It Solves
 
-### 🔹 1. Real-Time Streaming Ingestion
+In many systems, fraud detection happens in batches. That means transactions are analyzed after some delay.
 
-* Live transaction stream via Pathway file connector
-* Auto-detection of new transactions
-* No pipeline restart required
-* Fully event-driven
+This causes problems:
 
----
+* Fraud is detected late
+* Money may already be lost
+* Risk teams cannot react quickly
 
-### 🔹 2. Incremental Feature Engineering
-
-Computed in streaming mode using Pathway tables:
-
-* Rolling average spend per user
-* Transaction frequency in sliding time windows
-* Location change detection
-* User behavioral profiling
-
-All computations are stateful and incremental.
+This project solves that by detecting fraud instantly when the transaction happens.
 
 ---
 
-### 🔹 3. Fraud Risk Scoring Engine
+# 🧠 How the System Works
 
-Hybrid scoring model:
+## 1️⃣ Transaction Input
 
-* Large transaction deviation
-* Rapid-fire transaction detection
-* Geographic anomaly detection
+The system continuously receives transaction data.
+Each transaction contains:
 
-Outputs a real-time fraud risk score (0–1).
+* transaction_id
+* user_id
+* amount
+* location
+* merchant type
+* timestamp
 
----
-
-### 🔹 4. Event-Driven Fraud Alerts
-
-When risk_score > threshold:
-
-* System triggers alert instantly
-* Alert severity classification (Low → Critical)
-* Dashboard updates automatically
+As soon as a new transaction is added, the system processes it.
 
 ---
 
-### 🔹 5. AI Risk Assistant
+## 2️⃣ Feature Calculation
 
-Integrated AI layer generates:
+For every transaction, the system calculates useful information such as:
 
-* Human-readable fraud explanations
-* Context-aware reasoning
-* Transparent decision justification
+* What is the user’s average spending?
+* Is this amount much higher than usual?
+* Has the user made many transactions in a short time?
+* Has the user changed location suddenly?
+
+These calculations are done automatically and continuously.
+
+---
+
+## 3️⃣ Risk Score Calculation
+
+The system then assigns a risk score between 0 and 1.
+
+The score increases if:
+
+* The amount is unusually high
+* The user makes transactions very quickly
+* The location is unusual
+* Multiple suspicious patterns happen together
 
 Example:
 
-> "This transaction was flagged because it is 4.3x higher than the user's average spend and occurred within 90 seconds of a previous cross-border transaction."
+* Normal transaction → risk score 0.2
+* Suspicious transaction → risk score 0.75
 
 ---
 
-## 🏗 Architecture Overview
+## 4️⃣ Fraud Alert Generation
 
-```
-Live Transaction Stream
-        ↓
-Pathway Streaming Ingestion
-        ↓
-Incremental Feature Engineering
-        ↓
-Fraud Scoring Engine
-        ↓
-Event-Driven Alert Layer
-        ↓
-AI Explanation Generator
-        ↓
-Live Dashboard
-```
+If the risk score crosses a defined threshold (for example 0.7), the system:
+
+* Flags the transaction
+* Classifies severity (Low, Medium, High, Critical)
+* Displays it in the fraud alerts panel
+
+This happens instantly.
 
 ---
 
-## ⚡ Why Pathway?
+# 📊 What the Dashboard Shows
 
-This project strictly follows streaming-first principles:
+The dashboard includes:
 
-✔ No batch processing
-✔ No manual refresh
-✔ No static ML-only pipeline
-✔ All transformations executed inside Pathway streaming tables
-✔ Incremental computation with stateful windows
+### 1. Summary Metrics
 
-The system automatically updates whenever new data arrives.
-
----
-
-## 📊 Dashboard Features
-
-* Live transaction feed
-* Real-time fraud alert panel
-* Risk score visualization
-* Fraud trend graphs
-* User behavioral profile view
-* AI-generated fraud explanation panel
+* Total transactions processed
+* Number of high-risk alerts
+* Average risk score
+* Fraud rate percentage
 
 ---
 
-## 🛠 Tech Stack
+### 2. Live Transactions Table
 
-* **Pathway** – Real-time streaming engine
-* Python
-* Streamlit – Interactive dashboard
-* Scikit-learn (optional extension)
-* OpenAI API – AI explanation layer
+Shows incoming transactions in real time.
 
 ---
 
-## 📂 Project Structure
+### 3. Fraud Trend Graph
 
-```
-fraud-ai-assistant/
-│
-├── data/
-├── ingestion/
-├── features/
-├── scoring/
-├── alerts/
-├── assistant/
-├── pipeline/
-├── dashboard/
-└── utils/
-```
+Displays:
 
-Modular design ensures separation of concerns and production-style maintainability.
+* Risk score over time
+* Fraud alerts over time
+* Threshold line
+
+This shows how risk changes dynamically.
 
 ---
 
-## ▶️ How To Run
+### 4. Risk Breakdown
 
-### 1️⃣ Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
+Shows which features contributed to the risk score and their weights.
 
 ---
 
-### 2️⃣ Start Streaming Transaction Generator
+### 5. Fraud Alerts Panel
 
-```bash
-python data/sample_transactions_generator.py
-```
+Displays:
 
----
-
-### 3️⃣ Start Pathway Pipeline
-
-```bash
-python pipeline/main_pipeline.py
-```
+* Transaction details
+* Risk score
+* AI explanation
+* Severity level
 
 ---
 
-### 4️⃣ Launch Dashboard
+# ⚙️ Technology Used
 
-```bash
-streamlit run dashboard/app.py
-```
-
-The system will now update automatically as new transactions stream in.
-
----
-
-## 🔍 Real-Time Behavior Demonstration
-
-During demo:
-
-1. New transaction is appended
-2. Pipeline detects it instantly
-3. Features recomputed incrementally
-4. Risk score updated
-5. Alert triggered if threshold exceeded
-6. AI explanation generated
-7. Dashboard updates automatically
-
-No restart. No refresh.
+* Pathway – for real-time data processing
+* Python – backend logic
+* Streamlit – dashboard interface
+* Machine learning logic for risk scoring
+* AI model for explanation generation
 
 ---
 
-## 🧪 Fraud Detection Logic
+# 🔁 What Makes It Real-Time
 
-Risk Score = Weighted combination of:
+* The system does not wait for batches.
+* It does not need manual refresh.
+* When new data arrives:
 
-* Transaction amount deviation
-* Rapid transaction bursts
-* Geographic anomaly
-* User behavior mismatch
-
-Severity Levels:
-
-* 🟢 Low
-* 🟡 Medium
-* 🔴 High
-* 🔥 Critical
+  * It is processed immediately.
+  * Features are updated.
+  * Risk is recalculated.
+  * Dashboard updates automatically.
 
 ---
 
-## 📈 Stretch Capabilities
+# 🏦 Where It Can Be Used
 
-* Live document store integration (AML compliance RAG)
-* Multi-source ingestion
-* User risk trend visualization
-* Graph-based anomaly detection
-* Dockerized deployment
+This system can be used in:
 
----
-
-## 🎯 Hackathon Alignment
-
-This project fully satisfies:
-
-* Real-time streaming ingestion
-* Stateful window computations
-* Incremental transformations
-* Event-driven architecture
-* AI reasoning integration
-* Production-ready modular design
-
----
-
-## 🏆 Impact
-
-This system demonstrates how financial institutions can:
-
-* Detect fraud instantly
-* Reduce financial losses
-* Improve regulatory compliance
-* Increase explainability in AI-driven decisions
-
----
-
-## 📜 License
-
-Built for Hack For Green Bharat – Pathway Track.
-
----
-
-# 🔥 Final Impression
-
-This project is not just a fraud detector.
-
-It is a real-time, event-driven, explainable AI fraud intelligence system built with streaming-first principles.
+* Banks
+* Fintech companies
+* Payment gateways
+* Digital wallets
+* Online marketplaces
