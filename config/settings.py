@@ -1,9 +1,0 @@
-"""Centralized project settings."""
-
-RISK_THRESHOLD = 0.7
-LARGE_TXN_MULTIPLIER = 3.0
-RAPID_FIRE_WINDOW_SECONDS = 120
-RAPID_FIRE_TXN_COUNT = 3
-LOCATION_WINDOW_SIZE = 5
-STREAM_FILE_PATH = "data/transactions.csv"
-ALERTS_OUTPUT_PATH = "data/alerts.jsonl"

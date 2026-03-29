@@ -1,173 +1,133 @@
-# 📌 Project Description
+# 📘 AI Money Mentor - Money Health Score Module (2026)
 
-## Real-Time Financial Fraud Detection
+## 🧠 1. Problem Overview
+A majority of Indian users:
+- Don’t track finances properly
+- Don’t know if they are financially “healthy”
+- Lack awareness of savings, investments, and tax efficiency
 
-This project is a system that detects suspicious financial transactions in real time and explains why they might be fraud.
+👉 There is no simple, unified metric that tells:  
+“How financially strong am I right now?”
 
-When a new transaction happens, the system:
+## 🎯 2. Solution Overview
+The Money Health Score is a quantitative scoring system (0–100) that evaluates a user’s financial condition across key dimensions and provides:
+- A single financial wellness score
+- Category-wise breakdown
+- Actionable insights
+- Improvement recommendations
 
-1. Reads the transaction immediately
-2. Analyzes the user’s past behavior
-3. Calculates a fraud risk score
-4. Raises an alert if needed
-5. Explains the reason in simple language
+## 📊 3. Core Concept
+We break financial health into 6 dimensions:
 
-Everything happens automatically and updates live on the dashboard.
+| Dimension           | Description                  |
+|--------------------|------------------------------|
+| Savings Rate       | How much user saves monthly  |
+| Emergency Fund     | Financial safety buffer      |
+| Investments        | Wealth-building allocation   |
+| Debt Health        | Loan burden                  |
+| Insurance Coverage | Risk protection              |
+| Tax Efficiency     | Smart tax planning           |
 
----
+Each dimension contributes to the final score.
 
-# 🎯 What Problem It Solves
+## ⚖️ 4. Scoring Model
 
-In many systems, fraud detection happens in batches. That means transactions are analyzed after some delay.
+| Category         | Weight |
+|------------------|--------|
+| Savings Rate     | 20     |
+| Emergency Fund   | 20     |
+| Investments      | 20     |
+| Debt             | 15     |
+| Insurance        | 15     |
+| Tax Efficiency   | 10     |
 
-This causes problems:
+## 🧮 5. Detailed Scoring Logic
 
-* Fraud is detected late
-* Money may already be lost
-* Risk teams cannot react quickly
+- **Savings Rate Score (0–20):**
+  - Savings Rate = (Income – Expenses) / Income
+  - ≥ 40%: 20, 25–40%: 15, 10–25%: 10, <10%: 5
+- **Emergency Fund Score (0–20):**
+  - Months Covered = Savings / Monthly Expenses
+  - ≥ 6: 20, 3–6: 15, 1–3: 10, <1: 5
+- **Investment Score (0–20):**
+  - % of income invested: ≥30%: 20, 15–30%: 15, 5–15%: 10, <5%: 5
+- **Debt Score (0–15):**
+  - Debt-to-Income Ratio = EMI / Income
+  - <20%: 15, 20–40%: 10, >40%: 5
+- **Insurance Score (0–15):**
+  - Health + Term Insurance: 15, Only one: 10, None: 5
+- **Tax Efficiency Score (0–10):**
+  - Fully utilizing deductions: 10, Partial: 7, None: 3
 
-This project solves that by detecting fraud instantly when the transaction happens.
+## 🔍 6. Insight Generation Engine
+- IF emergency < 15 → “Your emergency fund is insufficient”
+- IF savings > 15 → “Strong savings discipline”
+- IF debt score low → “High debt burden affecting financial health”
 
----
+## 💡 7. Recommendation Engine
+- Low savings → Reduce discretionary spending
+- Low emergency fund → Save 3–6 months expenses
+- Low investment → Start SIP
+- High debt → Prioritize loan repayment
 
-# 🧠 How the System Works
+## 🔄 8. User Flow
+1. User enters financial details
+2. System calculates all metrics
+3. Score generated
+4. Insights derived
+5. Recommendations shown
+6. Data passed to AI Chat module
 
-## 1️⃣ Transaction Input
+## 🎯 9. UX Output
+- Big Score (e.g., 72/100)
+- Color: Red (<50), Yellow (50–75), Green (>75)
+- Category breakdown (bars)
+- Insights (bullets)
+- Recommendations (action list)
 
-The system continuously receives transaction data.
-Each transaction contains:
+## 📈 10. Impact
+- Before: User has no clarity
+- After: Knows exact financial position, what to fix, and gets a step-by-step plan
 
-* transaction_id
-* user_id
-* amount
-* location
-* merchant type
-* timestamp
+## 🧠 11. Differentiation
+- Not just a chatbot
+- Quantifiable scoring system
+- Actionable outputs
+- India-specific financial logic
 
-As soon as a new transaction is added, the system processes it.
+## ⚙️ 12. Tech Stack
+- Python 3.10+
+- Streamlit (UI)
+- Custom scoring/insight/recommendation engine (see utils)
 
----
-
-## 2️⃣ Feature Calculation
-
-For every transaction, the system calculates useful information such as:
-
-* What is the user’s average spending?
-* Is this amount much higher than usual?
-* Has the user made many transactions in a short time?
-* Has the user changed location suddenly?
-
-These calculations are done automatically and continuously.
-
----
-
-## 3️⃣ Risk Score Calculation
-
-The system then assigns a risk score between 0 and 1.
-
-The score increases if:
-
-* The amount is unusually high
-* The user makes transactions very quickly
-* The location is unusual
-* Multiple suspicious patterns happen together
-
-Example:
-
-* Normal transaction → risk score 0.2
-* Suspicious transaction → risk score 0.75
-
----
-
-## 4️⃣ Fraud Alert Generation
-
-If the risk score crosses a defined threshold (for example 0.7), the system:
-
-* Flags the transaction
-* Classifies severity (Low, Medium, High, Critical)
-* Displays it in the fraud alerts panel
-
-This happens instantly.
-
----
-
-# 📊 What the Dashboard Shows
-
-The dashboard includes:
-
-### 1. Summary Metrics
-
-* Total transactions processed
-* Number of high-risk alerts
-* Average risk score
-* Fraud rate percentage
-
----
-
-### 2. Live Transactions Table
-
-Shows incoming transactions in real time.
+## 🏁 FINAL LINE
+👉 “Money Health Score simplifies personal finance into a single number — and tells you exactly how to improve it.”
 
 ---
 
-### 3. Fraud Trend Graph
-
-Displays:
-
-* Risk score over time
-* Fraud alerts over time
-* Threshold line
-
-This shows how risk changes dynamically.
-
----
-
-### 4. Risk Breakdown
-
-Shows which features contributed to the risk score and their weights.
+# 🛠️ How to Run
+1. Install requirements:
+   ```powershell
+   pip install -r requirements.txt
+   ```
+2. Run the dashboard:
+   ```powershell
+   streamlit run dashboard/app.py
+   ```
+3. Enter your financial details and get your Money Health Score instantly!
 
 ---
 
-### 5. Fraud Alerts Panel
-
-Displays:
-
-* Transaction details
-* Risk score
-* AI explanation
-* Severity level
+# 📂 Project Structure
+- app.py – Streamlit UI
+- score_calculator.py – Scoring logic
+- insight_engine.py – Insight generation
+- recommendation_engine.py – Recommendations
+- money_health.py – (Optional) Legacy/compatibility logic
 
 ---
 
-# ⚙️ Technology Used
-
-* Pathway – for real-time data processing
-* Python – backend logic
-* Streamlit – dashboard interface
-* Machine learning logic for risk scoring
-* AI model for explanation generation
-
----
-
-# 🔁 What Makes It Real-Time
-
-* The system does not wait for batches.
-* It does not need manual refresh.
-* When new data arrives:
-
-  * It is processed immediately.
-  * Features are updated.
-  * Risk is recalculated.
-  * Dashboard updates automatically.
-
----
-
-# 🏦 Where It Can Be Used
-
-This system can be used in:
-
-* Banks
-* Fintech companies
-* Payment gateways
-* Digital wallets
-* Online marketplaces
+# 📝 Requirements
+- Python 3.10+
+- streamlit
+- plotly
