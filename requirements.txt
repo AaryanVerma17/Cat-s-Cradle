@@ -1,7 +1,0 @@
-pathway
-pandas
-scikit-learn
-streamlit
-openai
-python-dotenv
-plotly

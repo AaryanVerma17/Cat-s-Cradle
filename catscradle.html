@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAT'S CRADLE // NEON HANDS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #020b18;
+    overflow: hidden;
+    font-family: 'Share Tech Mono', monospace;
+    color: #00ffff;
+  }
+
+  #container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #videoElement {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #mainCanvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+  }
+
+  /* CRT scanline overlay */
+  #crt {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    animation: scanroll 8s linear infinite;
+  }
+
+  @keyframes scanroll {
+    from { background-position: 0 0; }
+    to { background-position: 0 100%; }
+  }
+
+  /* Vignette */
+  #vignette {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(2,11,24,0.85) 100%);
+  }
+
+  /* HUD */
+  #hud {
+    position: absolute;
+    top: 20px; left: 20px;
+    z-index: 20;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    line-height: 1.8;
+    pointer-events: none;
+  }
+
+  .hud-title {
+    font-size: 16px;
+    color: #ff00ff;
+    text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+    letter-spacing: 4px;
+    margin-bottom: 8px;
+  }
+
+  .hud-line {
+    color: #00ffff;
+    text-shadow: 0 0 6px #00ffff;
+    opacity: 0.7;
+  }
+
+  #status {
+    color: #ffff00;
+    text-shadow: 0 0 6px #ffff00;
+  }
+
+  #corner-br {
+    position: absolute;
+    bottom: 20px; right: 20px;
+    z-index: 20;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #00ffff;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  #permission-overlay {
+    position: absolute;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: rgba(2,11,24,0.95);
+  }
+
+  #permission-overlay h1 {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 28px;
+    letter-spacing: 6px;
+    color: #ff00ff;
+    text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+
+  #permission-overlay p {
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: #00ffff;
+    opacity: 0.7;
+    margin-bottom: 32px;
+    text-align: center;
+    max-width: 400px;
+    line-height: 1.7;
+  }
+
+  #startBtn {
+    background: transparent;
+    border: 1px solid #ff00ff;
+    color: #ff00ff;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 4px;
+    padding: 14px 40px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 0 20px rgba(255,0,255,0.4), inset 0 0 20px rgba(255,0,255,0.05);
+    transition: all 0.3s;
+  }
+
+  #startBtn:hover {
+    background: rgba(255,0,255,0.1);
+    box-shadow: 0 0 40px rgba(255,0,255,0.7), inset 0 0 30px rgba(255,0,255,0.1);
+  }
+</style>
+</head>
+<body>
+
+<div id="container">
+  <video id="videoElement" autoplay playsinline muted></video>
+  <canvas id="mainCanvas"></canvas>
+  <div id="crt"></div>
+  <div id="vignette"></div>
+
+  <div id="hud">
+    <div class="hud-title">CAT'S CRADLE</div>
+    <div class="hud-line">SYS // MEDIAPIPE HANDS v2</div>
+    <div class="hud-line" id="status">STATUS // INITIALIZING...</div>
+    <div class="hud-line" id="handCount">HANDS // 0 DETECTED</div>
+    <div class="hud-line" id="particleCount">PARTICLES // 0</div>
+  </div>
+
+  <div id="corner-br">NEURAL VISION v1.0 // 2025</div>
+
+  <div id="permission-overlay">
+    <h1>CAT'S CRADLE</h1>
+    <p>NEON STRING SIMULATION USING REAL-TIME HAND TRACKING.<br>CAMERA ACCESS REQUIRED.</p>
+    <button id="startBtn" onclick="initCamera()">ACTIVATE CAMERA</button>
+  </div>
+</div>
+
+<!-- MediaPipe -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+<script>
+const video = document.getElementById('videoElement');
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+const statusEl = document.getElementById('status');
+const handCountEl = document.getElementById('handCount');
+const particleCountEl = document.getElementById('particleCount');
+const permOverlay = document.getElementById('permission-overlay');
+
+// ---- State ----
+let hands = null;
+let latestResults = null;
+let particles = [];
+let lastTouchTime = {};
+let animFrame;
+
+// Finger tip landmark indices
+const FINGERTIPS = [4, 8, 12, 16, 20];
+// All landmarks for silhouette/joints
+const PALM_CONNECTIONS = [
+  [0,1],[1,2],[2,3],[3,4],
+  [0,5],[5,6],[6,7],[7,8],
+  [5,9],[9,10],[10,11],[11,12],
+  [9,13],[13,14],[14,15],[15,16],
+  [13,17],[17,18],[18,19],[19,20],
+  [0,17]
+];
+
+// ---- Particle system ----
+class Particle {
+  constructor(x, y, color) {
+    this.x = x; this.y = y;
+    this.color = color;
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 2 + Math.random() * 5;
+    this.vx = Math.cos(angle) * speed;
+    this.vy = Math.sin(angle) * speed;
+    this.life = 1.0;
+    this.decay = 0.025 + Math.random() * 0.03;
+    this.size = 2 + Math.random() * 4;
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.vx *= 0.92;
+    this.vy *= 0.92;
+    this.life -= this.decay;
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, this.life);
+    ctx.shadowColor = this.color;
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size * this.life, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function spawnExplosion(x, y, color) {
+  for (let i = 0; i < 28; i++) {
+    particles.push(new Particle(x, y, color));
+  }
+}
+
+// ---- Canvas resize ----
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// ---- Camera init ----
+async function initCamera() {
+  permOverlay.style.display = 'none';
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720, facingMode: 'user' } });
+    video.srcObject = stream;
+    video.play();
+    statusEl.textContent = 'STATUS // LOADING MODEL...';
+    initMediaPipe();
+  } catch(e) {
+    permOverlay.style.display = 'flex';
+    alert('Camera access denied: ' + e.message);
+  }
+}
+
+// ---- MediaPipe ----
+function initMediaPipe() {
+  hands = new Hands({
+    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+  });
+
+  hands.setOptions({
+    maxNumHands: 2,
+    modelComplexity: 1,
+    minDetectionConfidence: 0.7,
+    minTrackingConfidence: 0.6
+  });
+
+  hands.onResults((results) => {
+    latestResults = results;
+    const n = results.multiHandLandmarks ? results.multiHandLandmarks.length : 0;
+    handCountEl.textContent = `HANDS // ${n} DETECTED`;
+    if (n > 0) statusEl.textContent = 'STATUS // TRACKING ACTIVE';
+    else statusEl.textContent = 'STATUS // AWAITING HANDS...';
+  });
+
+  const camera = new Camera(video, {
+    onFrame: async () => {
+      if (hands) await hands.send({ image: video });
+    },
+    width: 1280,
+    height: 720
+  });
+  camera.start().then(() => {
+    statusEl.textContent = 'STATUS // CAMERA ACTIVE';
+    renderLoop();
+  });
+}
+
+// ---- Coordinate helpers ----
+function lm(landmark) {
+  // mirror X (video is scaleX(-1) visually but canvas is not flipped)
+  return {
+    x: (1 - landmark.x) * canvas.width,
+    y: landmark.y * canvas.height
+  };
+}
+
+// ---- Color helpers ----
+function hslStr(h, s, l) { return `hsl(${h},${s}%,${l}%)`; }
+
+function stretchColor(dist, maxDist) {
+  const t = Math.min(dist / maxDist, 1);
+  // cyan -> magenta -> yellow
+  const h = 180 + t * 120; // 180 (cyan) to 300 (magenta)
+  const l = 55 + t * 10;
+  return { hsl: `hsl(${h},100%,${l}%)`, h, t };
+}
+
+// ---- Draw glowing dot ----
+function drawDot(x, y, color, radius = 5, blur = 16) {
+  ctx.save();
+  ctx.shadowColor = color;
+  ctx.shadowBlur = blur;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fill();
+  // white core
+  ctx.shadowBlur = 4;
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.beginPath();
+  ctx.arc(x, y, radius * 0.4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+// ---- Draw hand skeleton silhouette ----
+function drawHandSilhouette(landmarks, handColor) {
+  ctx.save();
+  ctx.strokeStyle = handColor;
+  ctx.lineWidth = 2;
+  ctx.shadowColor = handColor;
+  ctx.shadowBlur = 10;
+  ctx.globalAlpha = 0.5;
+  for (const [a, b] of PALM_CONNECTIONS) {
+    const pa = lm(landmarks[a]);
+    const pb = lm(landmarks[b]);
+    ctx.beginPath();
+    ctx.moveTo(pa.x, pa.y);
+    ctx.lineTo(pb.x, pb.y);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Joints
+  for (let i = 0; i < landmarks.length; i++) {
+    const p = lm(landmarks[i]);
+    const isTip = FINGERTIPS.includes(i);
+    drawDot(p.x, p.y, handColor, isTip ? 7 : 4, isTip ? 20 : 10);
+  }
+}
+
+// ---- Draw laser string between two points ----
+function drawLaserString(x1, y1, x2, y2, color, thickness, t) {
+  // Beam core
+  ctx.save();
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 30;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = thickness;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+
+  // Bright center line
+  ctx.shadowBlur = 5;
+  ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+  ctx.lineWidth = Math.max(0.5, thickness * 0.25);
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ---- Main render loop ----
+function renderLoop() {
+  animFrame = requestAnimationFrame(renderLoop);
+
+  // Dark background with slight trail
+  ctx.fillStyle = 'rgba(2,11,24,0.82)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const results = latestResults;
+
+  if (results && results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+    const handData = results.multiHandLandmarks;
+    const handedness = results.multiHandedness || [];
+
+    // Map label to landmarks
+    let leftLM = null, rightLM = null;
+    handedness.forEach((h, i) => {
+      // MediaPipe: "Left" from camera = right from user (mirrored)
+      if (h.label === 'Left') rightLM = handData[i];
+      else leftLM = handData[i];
+    });
+
+    // Draw silhouettes
+    if (leftLM) drawHandSilhouette(leftLM, '#00ffff');
+    if (rightLM) drawHandSilhouette(rightLM, '#ff00ff');
+
+    // Draw strings between hands
+    if (leftLM && rightLM) {
+      for (let i = 0; i < FINGERTIPS.length; i++) {
+        const tipL = lm(leftLM[FINGERTIPS[i]]);
+        const tipR = lm(rightLM[FINGERTIPS[i]]);
+
+        const dx = tipR.x - tipL.x;
+        const dy = tipR.y - tipL.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const maxDist = canvas.width * 0.9;
+
+        const { hsl, t } = stretchColor(dist, maxDist);
+        const thickness = Math.max(1, 4 - t * 2.5);
+
+        drawLaserString(tipL.x, tipL.y, tipR.x, tipR.y, hsl, thickness, t);
+
+        // Touch detection
+        const touchKey = `t${i}`;
+        if (dist < 28) {
+          const now = Date.now();
+          if (!lastTouchTime[touchKey] || now - lastTouchTime[touchKey] > 300) {
+            lastTouchTime[touchKey] = now;
+            const mx = (tipL.x + tipR.x) / 2;
+            const my = (tipL.y + tipR.y) / 2;
+            const colors = ['#00ffff','#ff00ff','#ffff00','#ff8800','#00ff88'];
+            spawnExplosion(mx, my, colors[i % colors.length]);
+          }
+        }
+      }
+    } else if (handData.length === 1) {
+      // Single hand — draw strings from each tip to center palm
+      const lms = handData[0];
+      const palmPt = lm(lms[0]);
+      const isLeft = handedness[0] && handedness[0].label === 'Right';
+      const col = isLeft ? '#00ffff' : '#ff00ff';
+      for (const tip of FINGERTIPS) {
+        const p = lm(lms[tip]);
+        const dx = p.x - palmPt.x, dy = p.y - palmPt.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        drawLaserString(palmPt.x, palmPt.y, p.x, p.y, col, 2, dist/200);
+      }
+    }
+  }
+
+  // Update + draw particles
+  particles = particles.filter(p => p.life > 0);
+  for (const p of particles) {
+    p.update();
+    p.draw(ctx);
+  }
+  particleCountEl.textContent = `PARTICLES // ${particles.length}`;
+}
+</script>
+</body>
+</html>
