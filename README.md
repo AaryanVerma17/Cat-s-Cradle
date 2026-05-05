@@ -33,10 +33,10 @@
 |---|---|
 | [MediaPipe Hands](https://google.github.io/mediapipe/solutions/hands) | Real-time hand landmark detection (21 points per hand) |
 | [MediaPipe Camera Utils](https://www.npmjs.com/package/@mediapipe/camera_utils) | WebRTC camera feed management |
-| HTML5 Canvas 2D | Rendering — glow effects via `shadowBlur`, particles, laser beams |
+| HTML5 Canvas 2D | Rendering - glow effects via `shadowBlur`, particles, laser beams |
 | Vanilla JavaScript | All animation and interaction logic |
 
-All libraries are loaded via CDN — no `npm install` required.
+All libraries are loaded via CDN - no `npm install` required.
 
 ---
 
@@ -44,7 +44,7 @@ All libraries are loaded via CDN — no `npm install` required.
 
 ```
 cats-cradle/
-└── index.html    # Entire app — HTML + CSS + JS in one file
+└── index.html    # Entire app - HTML + CSS + JS in one file
 └── README.md     # This file
 ```
 
